@@ -21,11 +21,20 @@ router.get("/:code", async function(req, res, next) {
     const query = await db.query(
       "SELECT code, name, description FROM companies WHERE code = $1", [req.params.code]);
 
+    const invoices = await db.query(
+      "SELECT id FROM invoices WHERE comp_code = $1", [req.params.code]);
+    
+
     if (query.rows.length === 0) {
       let notFoundError = new Error(`There is no company with id '${req.params.code}`);
       notFoundError.status = 404;
       throw notFoundError;
     }
+
+    const company = query.rows[0];
+    company.invoices = invoices.rows.map(inv => inv.id);
+
+
     return res.json({ company: query.rows[0] });
   } catch (err) {
     return next(err);
@@ -80,7 +89,7 @@ router.delete("/:code", async function(req, res, next) {
       "DELETE FROM companies WHERE code = $1 RETURNING code", [req.params.code]);
 
     if (result.rows.length === 0) {
-      throw new ExpressError(`There is no company with id of '${req.params.id}`, 404);
+      throw new ExpressError(`There is no company with code of '${req.params.code}`, 404);
     }
     return res.json({ message: "Company deleted" });
   } catch (err) {

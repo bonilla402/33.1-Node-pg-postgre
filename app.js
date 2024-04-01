@@ -3,11 +3,13 @@
 
 const express = require("express");
 const app = express();
-const catRoutes = require("./routes/companies");
+const companiesRoutes = require("./routes/companies");
+const invoicesRoutes = require("./routes/invoices");
 const ExpressError = require("./expressError")
 
 app.use(express.json());
-app.use("/companies", catRoutes);
+app.use("/companies", companiesRoutes);
+app.use("/invoices", invoicesRoutes);
 
 /** 404 handler */
 
